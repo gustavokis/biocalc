@@ -98,16 +98,19 @@ def main():
         """)
 
         st.divider()
-        st.caption("v1.0.0 | Engenharia de Software")
+        st.caption("v1.0.0 | Sustentabilidade em Computação - 2025")
 
     # Tabs principais
-    tab1, tab2 = st.tabs(["📝 Entrada de Dados", "📊 Resultados"])
+    tab1, tab2, tab3 = st.tabs(["📝 Entrada de Dados", "📊 Resultados", "📚 Histórico"])
 
     with tab1:
         entrada_dados(biomassa_selecionada)
 
     with tab2:
         exibir_resultados()
+
+    with tab3:
+        exibir_historico()
 
 
 def entrada_dados(biomassa: str):
@@ -301,8 +304,18 @@ def entrada_dados(biomassa: str):
                         resultados = st.session_state.calculadora.calcular_intensidade_carbono(dados_entrada)
                         st.session_state.resultados = resultados
                         st.session_state.dados_entrada = dados_entrada
+
+                        # Adicionar ao histórico
+                        if 'historico' not in st.session_state:
+                            st.session_state.historico = []
+
+                        from datetime import datetime
+                        resultado_com_timestamp = resultados.copy()
+                        resultado_com_timestamp['timestamp'] = datetime.now()
+                        resultado_com_timestamp['dados_entrada'] = dados_entrada
+                        st.session_state.historico.append(resultado_com_timestamp)
+
                         st.success("✅ Cálculo realizado com sucesso! Veja os resultados na aba 'Resultados'.")
-                        st.balloons()
                     except Exception as e:
                         st.error(f"❌ Erro ao calcular: {str(e)}")
 
@@ -507,6 +520,92 @@ def exibir_resultados():
                     file_name=nome_arquivo,
                     mime="text/csv"
                 )
+
+
+def exibir_historico():
+    """Exibe o histórico de cálculos realizados"""
+
+    st.header("📚 Histórico de Cálculos")
+
+    # Inicializar histórico se não existir
+    if 'historico' not in st.session_state:
+        st.session_state.historico = []
+
+    if len(st.session_state.historico) == 0:
+        st.info("ℹ️ Nenhum cálculo no histórico ainda. Realize cálculos na aba 'Entrada de Dados' para vê-los aqui.")
+        return
+
+    # Estatísticas gerais
+    st.subheader("📊 Estatísticas Gerais")
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("Total de Cálculos", len(st.session_state.historico))
+
+    with col2:
+        biomassas = [r['biomassa'] for r in st.session_state.historico]
+        biomassa_mais_usada = max(set(biomassas), key=biomassas.count) if biomassas else "N/A"
+        st.metric("Biomassa Mais Usada", biomassa_mais_usada.title())
+
+    with col3:
+        ci_medio = sum(r['intensidade_carbono_g_co2_mj'] for r in st.session_state.historico) / len(st.session_state.historico)
+        st.metric("CI Médio", f"{ci_medio:.2f} gCO₂/MJ")
+
+    st.divider()
+
+    # Botões de ação
+    col1, col2 = st.columns([3, 1])
+    with col2:
+        if st.button("🗑️ Limpar Todo Histórico", type="secondary"):
+            st.session_state.historico = []
+            st.rerun()
+
+    st.divider()
+
+    # Lista de cálculos (mais recentes primeiro)
+    st.subheader("📋 Cálculos Realizados")
+
+    for idx, resultado in enumerate(reversed(st.session_state.historico)):
+        real_idx = len(st.session_state.historico) - 1 - idx
+
+        with st.expander(
+            f"🌱 {resultado['biomassa'].title()} - "
+            f"{resultado['timestamp'].strftime('%d/%m/%Y %H:%M:%S')} - "
+            f"CI: {resultado['intensidade_carbono_g_co2_mj']:.2f} gCO₂/MJ",
+            expanded=False
+        ):
+            col1, col2 = st.columns([4, 1])
+
+            with col1:
+                # Informações principais
+                st.markdown(f"""
+                **Biomassa:** {resultado['biomassa'].title()}
+                **Data/Hora:** {resultado['timestamp'].strftime('%d/%m/%Y às %H:%M:%S')}
+                **Intensidade de Carbono:** {resultado['intensidade_carbono_g_co2_mj']:.2f} gCO₂/MJ
+                **NEEA:** {resultado['neea']:.2f} gCO₂/MJ
+                **Redução vs Fóssil:** {resultado['comparacao_fossil']['reducao_percentual']:.1f}%
+                """)
+
+                # Emissões por fase
+                st.markdown("**Emissões por Fase:**")
+                for fase, dados in resultado['resultados_por_fase'].items():
+                    st.markdown(f"- **{fase.title()}:** {dados['emissoes_kg_co2']:.2f} kg CO₂ ({dados['percentual']:.1f}%)")
+
+                # Dados de entrada
+                with st.expander("Ver dados de entrada"):
+                    st.json(resultado['dados_entrada'])
+
+            with col2:
+                # Botão para excluir este cálculo
+                if st.button(f"🗑️ Excluir", key=f"delete_{real_idx}"):
+                    st.session_state.historico.pop(real_idx)
+                    st.rerun()
+
+                # Botão para carregar este cálculo
+                if st.button(f"📥 Carregar", key=f"load_{real_idx}"):
+                    st.session_state.resultados = resultado
+                    st.session_state.dados_entrada = resultado['dados_entrada']
+                    st.success("✅ Cálculo carregado! Veja na aba 'Resultados'")
 
 
 if __name__ == "__main__":
