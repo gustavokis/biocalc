@@ -1,0 +1,29 @@
+{
+  "amendoim": {
+    "nome": "Casca de Amendoim",
+    "descricao": "Resíduo agrícola do processamento de amendoim",
+    "pci": 17.8,
+    "unidade_pci": "MJ/kg",
+    "densidade": 600,
+    "fator_biomassa_agricola": 120.0,
+    "tipo": "residuo_agricola"
+  },
+  "pinus": {
+    "nome": "Resíduos de Pinus",
+    "descricao": "Resíduos florestais de Pinus sp.",
+    "pci": 18.5,
+    "unidade_pci": "MJ/kg",
+    "densidade": 550,
+    "fator_biomassa_agricola": 80.0,
+    "tipo": "residuo_florestal"
+  },
+  "eucalipto": {
+    "nome": "Resíduos de Eucalipto",
+    "descricao": "Resíduos florestais de Eucalyptus sp.",
+    "pci": 18.2,
+    "unidade_pci": "MJ/kg",
+    "densidade": 580,
+    "fator_biomassa_agricola": 75.0,
+    "tipo": "residuo_florestal"
+  }
+}

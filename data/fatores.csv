@@ -1,0 +1,18 @@
+parametro,valor,unidade,fonte
+fator_eletricidade_br,95.0,gCO2/kWh,Grid BR medio
+fator_diesel,2680.0,gCO2/L,IPCC
+fator_gasolina,2300.0,gCO2/L,IPCC
+fator_gas_natural,2020.0,gCO2/m3,IPCC
+fator_transporte_rodoviario,62.0,gCO2/tkm,Ecoinvent
+fator_transporte_maritimo,8.5,gCO2/tkm,Ecoinvent
+fator_transporte_ferroviario,22.0,gCO2/tkm,Ecoinvent
+fator_fertilizante_n,6540.0,gCO2/kg,IPCC
+fator_fertilizante_p,1200.0,gCO2/kg,IPCC
+fator_fertilizante_k,630.0,gCO2/kg,IPCC
+fator_pesticida,10000.0,gCO2/kg,Ecoinvent medio
+fator_agua,0.36,gCO2/m3,Ecoinvent BR
+fator_combustao,0.0,gCO2/MJ,Biogenico (CF=0)
+pci_pinus,18.5,MJ/kg,Literatura
+pci_eucalipto,18.2,MJ/kg,Literatura
+pci_amendoim,17.8,MJ/kg,Literatura
+ci_fossil_referencia,85.0,gCO2/MJ,RenovaCalc media ponderada
